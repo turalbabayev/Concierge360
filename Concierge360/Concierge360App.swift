@@ -9,9 +9,17 @@ import SwiftUI
 
 @main
 struct Concierge360App: App {
+    @StateObject private var hotelManager = HotelManager()
+    @StateObject private var authManager = AuthenticationManager()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            OnboardingView()
+                .environmentObject(hotelManager)
+                .environmentObject(authManager)
+                .onAppear {
+                    authManager.loadSavedRole()
+                }
         }
     }
 }
