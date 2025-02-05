@@ -13,6 +13,7 @@ struct LoginView: View {
     @EnvironmentObject var authManager: AuthenticationManager
     @StateObject private var viewModel: LoginViewModel
     @FocusState private var isTextFieldFocused: Bool
+    @State private var showGetStartedAlert = false
     
     init() {
         self._viewModel = StateObject(wrappedValue: LoginViewModel())
@@ -22,7 +23,19 @@ struct LoginView: View {
         VStack {
             Spacer()
             
-            CustomNavigationBar()
+            CustomNavigationBar(
+                centerText: "Don't have an account?",
+                rightButton: NavigationBarButton(
+                    title: "Get Started",
+                    action: { 
+                        withAnimation {
+                            showGetStartedAlert.toggle()
+                        }
+                    }
+                )
+            )
+            
+            
             
             Text("Concierge360")
                 .font(.system(size: 32, weight: .bold))
@@ -176,10 +189,15 @@ struct LoginView: View {
             )
         )
         .navigationBarBackButtonHidden(true)
+        .overlay {
+            CustomAlert(show: $showGetStartedAlert, icon: .error, text: "Join Concierge360", circleAColor: .red, details: "To register your hotel with our application or create new admin/staff accounts for your existing hotel, please contact our system administrator for assistance.")
+        }
         
         NavigationLink(destination: HomeView(), isActive: $viewModel.navigateToHome) {
             EmptyView()
         }
+        
+        
     }
 }
 

@@ -14,6 +14,15 @@ struct HomeView: View {
     
     var body: some View {
         VStack {
+            CustomNavigationBar(title: "Home View",rightButton: NavigationBarButton(
+                title: "Log out",
+                action: {
+                    authManager.logout()
+                    hotelManager.selectedHotel = nil // Hotel seçimini de temizleyelim
+                    shouldNavigateToRoot = true
+                }
+            ))
+
             // Üst kısım - Header
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
@@ -71,14 +80,6 @@ struct HomeView: View {
             
             Spacer()
         }
-        .navigationBarItems(trailing: Button(action: {
-            authManager.logout()
-            hotelManager.selectedHotel = nil // Hotel seçimini de temizleyelim
-            shouldNavigateToRoot = true
-        }) {
-            Text("Logout")
-                .foregroundColor(.red)
-        })
         .navigationBarBackButtonHidden(true)
         .navigationDestination(isPresented: $shouldNavigateToRoot) {
             OnboardingView()

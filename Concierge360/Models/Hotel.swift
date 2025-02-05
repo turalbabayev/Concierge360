@@ -19,7 +19,7 @@ struct Hotel: Identifiable, Hashable {
 }
 
 var hotelList: [Hotel] = [
-    .init(logo: "airplane", title: "Sayeban Gold Hotel"),
-    .init(logo: "wifi", title: "Dream Hotel"),
-    .init(logo: "personalhotspot", title: "Erk Hotel")
+    .init(logo: "sayebangold", title: "Sayeban Gold Hotel"),
+    .init(logo: "dreambosphorus", title: "Dream Bosphorus Hotel"),
+    .init(logo: "erk", title: "Erk Hotel")
 ]

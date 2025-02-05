@@ -1,0 +1,23 @@
+{
+  "images" : [
+    {
+      "filename" : "dream-bosphorus-hotel-3f324a0e89439e08890f3c56900b2468@1x.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "dream-bosphorus-hotel-3f324a0e89439e08890f3c56900b2468@2x.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "dream-bosphorus-hotel-3f324a0e89439e08890f3c56900b2468@3x.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
