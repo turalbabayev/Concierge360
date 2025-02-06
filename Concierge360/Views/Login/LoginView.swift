@@ -35,8 +35,6 @@ struct LoginView: View {
                 )
             )
             
-            
-            
             Text("Concierge360")
                 .font(.system(size: 32, weight: .bold))
                 .foregroundColor(.white)

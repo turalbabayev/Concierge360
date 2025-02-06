@@ -17,9 +17,9 @@ struct HomeView : View {
         ZStack {
             switch selectedTab {
             case .Home:
-                Text("Home Page")
+                HomeContentView()
             case .bell:
-                OnboardingView()
+                Text("Sonra Guncellenecek")
             case .message:
                 Text("message")
             case .like:
