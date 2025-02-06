@@ -8,17 +8,42 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Binding var selectedTab:TabIcon
+    @State var xOffset = 0 * 70.0
+    
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            Spacer()
+            HStack{
+                ForEach(tabItems) {item in
+                    Spacer()
+                    Image(systemName: item.iconname)
+                        .foregroundStyle(selectedTab == item.tab ? .blue : .gray)
+                        .onTapGesture {
+                            withAnimation {
+                                selectedTab = item.tab
+                                xOffset = CGFloat(item.index * 70)
+                            }
+                        }
+                    Spacer()
+                }
+                .frame(width: 23)
+            }
+            .frame(width: 365, height: 70)
+            .background(
+                CustomShape(xAxis: xOffset + 12)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            )
+            .overlay(alignment: .topLeading) {
+                Circle().frame(width: 10, height: 10)
+                    .offset(x:36)
+                    .offset(x: xOffset)
+            }
         }
         .padding()
     }
 }
 
 #Preview {
-    ContentView()
+    ContentView(selectedTab: .constant(.Home))
 }
