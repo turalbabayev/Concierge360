@@ -12,7 +12,7 @@ struct OnboardingView: View {
     @EnvironmentObject var hotelManager: HotelManager
     
     var body: some View {
-        NavigationStack{
+        NavigationStack {
             ZStack {
                 LinearGradient(
                     gradient: Gradient(colors: [Color.blue.opacity(0.9), Color.purple.opacity(0.8)]),
@@ -89,8 +89,8 @@ struct OnboardingView: View {
                         }
                     }
                 }
-                .edgesIgnoringSafeArea(.all)
             }
+            .edgesIgnoringSafeArea(.all)
         }
     }
 }

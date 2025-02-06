@@ -13,14 +13,13 @@ struct HomeView : View {
     @EnvironmentObject var hotelManager: HotelManager
     @State private var showGetStartedAlert = true
 
-    
     var body: some View {
         ZStack {
             switch selectedTab {
             case .Home:
                 Text("Home Page")
             case .bell:
-                Text("bell")
+                OnboardingView()
             case .message:
                 Text("message")
             case .like:
@@ -29,15 +28,11 @@ struct HomeView : View {
                 if authManager.currentRole == .manager {
                     Text("person") // Yönetici profil sayfası
                 } else {
-                    // Guest kullanıcılar için person tab'ine erişim engellendi
-                    
                     CustomAlert(show: $showGetStartedAlert, icon: .error, text: "Access Denied", circleAColor: .red, details: "You must be login as manager.")
-                    Spacer()
                 }
             }
             
             ContentView(selectedTab: $selectedTab)
-                
         }
         .navigationBarBackButtonHidden(true)
     }
