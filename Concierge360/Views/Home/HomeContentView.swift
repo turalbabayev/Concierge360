@@ -19,47 +19,63 @@ struct HomeContentView: View {
         ScrollView {
             VStack {
                 HStack{
-                    ZStack {
-                        Circle()
-                            .fill(.white)
-                            .frame(width: 40, height: 40)
-                            .overlay {
-                                Circle().stroke(Color.gray.opacity(0.2), lineWidth: 1) // İnce sınır çizgisi
+                    HStack{
+                        ZStack {
+                            Circle()
+                                .fill(.white)
+                                .frame(width: 40, height: 40)
+                                .overlay {
+                                    Circle().stroke(Color.gray.opacity(0.2), lineWidth: 1) // İnce sınır çizgisi
 
-                            }
-                        Image(hotelManager.selectedHotel?.logo ?? "sayebangold")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 35, height: 35)
-                            .clipShape(Circle())
-                            .foregroundStyle(.black)
-                    }
-                    .onTapGesture {
-                        print("tiklandi")
+                                }
+                            Image(hotelManager.selectedHotel?.logo ?? "sayebangold")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 35, height: 35)
+                                .clipShape(Circle())
+                                .foregroundStyle(.black)
+                        }
+                        .onTapGesture {
+                            print("tiklandi")
+                        }
+                        VStack(alignment: .leading){
+                            Text(authManager.currentRole == .manager ? "Manager Access" : "Guest")
+                                .font(.caption)
+                            Text(hotelManager.selectedHotel?.toString() ?? "Sayeban Gold Hotel")
+                                .font(.caption2)
+                                .foregroundColor(.gray)
+                        }
                     }
                     Spacer()
-                    VStack{
-                        Text(authManager.currentRole == .manager ? "Manager Access" : "Guest")
-                            .font(.caption)
-                        Text(hotelManager.selectedHotel?.toString() ?? "Sayeban Gold Hotel")
-                            .font(.caption2)
-                            .foregroundColor(.gray)
-                    }
-                    Spacer()
-                    ZStack {
-                        Circle()
-                            .fill(.white)
-                            .frame(width: 40, height: 40)
-                            .overlay {
-                                Circle().stroke(Color.gray.opacity(0.2), lineWidth: 1) // İnce sınır çizgisi
+                    HStack(spacing:5){
+                        ZStack {
+                            Circle()
+                                .fill(.white)
+                                .frame(width: 40, height: 40)
+                                .overlay {
+                                    Circle().stroke(Color.gray.opacity(0.2), lineWidth: 1) // İnce sınır çizgisi
 
-                            }
-                        Image(systemName: "gearshape")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 20, height: 20)
-                            .clipShape(Circle())
-                            .foregroundStyle(.black)
+                                }
+                            Image(systemName: "magnifyingglass")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 18, height: 18)
+                                .foregroundStyle(.black.opacity(0.6))
+                        }
+                        ZStack {
+                            Circle()
+                                .fill(.white)
+                                .frame(width: 40, height: 40)
+                                .overlay {
+                                    Circle().stroke(Color.gray.opacity(0.2), lineWidth: 1) // İnce sınır çizgisi
+
+                                }
+                            Image(systemName: "gearshape")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 18, height: 18)
+                                .foregroundStyle(.black.opacity(0.6))
+                        }
                     }
                     .onTapGesture {
                         print("tiklandi")
@@ -68,10 +84,77 @@ struct HomeContentView: View {
                 .padding(.horizontal, 20)
                 
                 Spacer()
+                                                
+                //CustomCarousel()
                 
-                SearchBar()
-                                
-                CustomCarousel()
+                HStack(spacing: 12) {
+                    // Konum İkonu (Mavi Daire İçinde)
+                    ZStack {
+                        Circle()
+                            .fill(Color.white)
+                            .frame(width: 40, height: 40)
+                            .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 2)
+                        
+                        Image("location")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 22, height: 22)
+                            .foregroundColor(.blue)
+                    }
+                    
+                    // Metin Alanı
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("You Can Change Your Hotel to different hotel.")
+                            .font(.system(size: 13, weight: .light))
+                            .foregroundColor(.black)
+                    }
+                    .lineLimit(2)
+                    
+                    Spacer()
+                    
+                    // Sağ Ok İkonu
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundColor(.black.opacity(0.7))
+                }
+                .padding()
+                .frame(maxWidth: .infinity, minHeight: 60)
+                .background(Color.blue.opacity(0.1)) // Açık mavi arka plan
+                .clipShape(RoundedRectangle(cornerRadius: 15))
+                .padding(.horizontal, 16) // Ekran kenar boşluğu
+                .padding(.vertical, 16)
+                
+                VStack(spacing: 10){
+                    HStack{
+                        Text("Most Popular Tours")
+                            .foregroundStyle(.black)
+                            .bold()
+                        
+                        Spacer()
+                        
+                        Button {
+                            print("tiklandi")
+                        } label: {
+                            Text("See All")
+                                .bold()
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    
+                    GeometryReader { geometry in
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 10) {
+                                ForEach(tourList) { card in
+                                    TourCardView(card: card) // 🔹 Burada artık iç içe kod kalmadı!
+                                }
+                            }
+                            .padding(.horizontal, 10)
+                        }
+                    }
+                    .frame(height: 220)
+                    .padding(.horizontal, 10)
+                    .padding(.top, 10)
+                }
                 
                 Spacer()
             }
@@ -82,30 +165,10 @@ struct HomeContentView: View {
         }
         .navigationBarBackButtonHidden(true)
 
+        
+        
     }
     
-    @ViewBuilder
-    func SearchBar() -> some View {
-        VStack(spacing: 10){
-            HStack(spacing: 12){
-                Image(systemName: "magnifyingglass")
-                    .font(.title3)
-                
-                TextField("Search for hotels", text: $searchText)
-                    .focused($isTextFieldFocused)
-            }
-            .padding(.vertical, 10)
-            .padding(.horizontal,15)
-            .frame(height: 45)
-            .background{
-                RoundedRectangle(cornerRadius: 25)
-                    .fill(.white)
-                    .shadow(color: .black.opacity(0.25), radius: 8 ,x: 5, y: 10)
-            }
-        }
-        .padding(.horizontal,20)
-        .padding(.top, 16)
-    }
 }
 
 #Preview {
