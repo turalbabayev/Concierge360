@@ -18,8 +18,6 @@ struct TourCardView: View {
                 .frame(width: 160, height: 250)
                 .clipShape(RoundedRectangle(cornerRadius: 15))
 
-            
-
             // 🔹 Siyah Gradient Overlay
             LinearGradient(
                 gradient: Gradient(colors: [Color.black.opacity(0.9), Color.black.opacity(0)]),
@@ -32,7 +30,7 @@ struct TourCardView: View {
             // 🔹 İçerik (Altta kalmalı)
             VStack(alignment: .leading, spacing: 4) {
                 Text(card.title)
-                    .font(.system(size: 13, weight: .bold))
+                    .font(.system(size: 12, weight: .bold))
                     .foregroundColor(.white)
                     .bold()
 
