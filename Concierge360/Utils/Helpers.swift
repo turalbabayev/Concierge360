@@ -7,14 +7,6 @@
 
 import SwiftUI
 
-struct Helpers: View {
-    var body: some View {
-        Text("sdhdhs")
-    }
-}
-
-
-
 struct GradientButtonStyle: ButtonStyle {
     @State var isAnimating = false
     let gradientColors = Gradient(colors: [Color.blue, Color.purple])

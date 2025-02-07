@@ -1,0 +1,21 @@
+{
+  "images" : [
+    {
+      "filename" : "29594258122313422305transfer-otel80fea688d669ecb0ffb762d9460369ff.jpg",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
