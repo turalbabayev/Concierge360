@@ -10,6 +10,8 @@ import SwiftUI
 class HomeContentViewModel: ObservableObject {
     @Published var selectedServiceCategory: ServiceCategory = .all
     @Published var filteredServices: [Services] = []
+    @Published var searchText: String = ""
+    @Published var isTextFieldFocused: Bool = false
     
     // Örnek servis verileri
     private let allServices: [Services] = [
@@ -42,5 +44,26 @@ class HomeContentViewModel: ObservableObject {
         
         // Her durumda sadece ilk 3 servisi al
         filteredServices = Array(services.prefix(3))
+    }
+    
+    // Yeni fonksiyonlar
+    func handleSearchTap() {
+        print("Search tapped")
+    }
+    
+    func handleSettingsTap() {
+        print("Settings tapped")
+    }
+    
+    func handleHotelChange() {
+        print("Hotel change tapped")
+    }
+    
+    func handleSeeAllTours() {
+        print("See All Tours tapped")
+    }
+    
+    func handleSeeAllServices() {
+        print("See All Services tapped")
     }
 }
