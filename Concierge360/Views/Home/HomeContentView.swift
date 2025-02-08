@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeContentView: View {
     @EnvironmentObject var authManager: AuthenticationManager
     @EnvironmentObject var hotelManager: HotelManager
+    @StateObject private var viewModel = HomeContentViewModel()
     @State private var shouldNavigateToRoot = false
     @State private var searchText: String = ""
     @FocusState private var isTextFieldFocused: Bool
@@ -134,10 +135,10 @@ struct HomeContentView: View {
                             Spacer()
                             
                             Button {
-                                print("tiklandi")
+                                print("See All Tiklandi")
                             } label: {
                                 Text("See All")
-                                    .bold()
+                                    .font(.system(size: 12))
                             }
                         }
                         .padding(.horizontal, 20)
@@ -171,10 +172,39 @@ struct HomeContentView: View {
                                 print("tiklandi")
                             } label: {
                                 Text("See All")
-                                    .bold()
+                                    .font(.system(size: 12))
                             }
                         }
                         .padding(.horizontal, 20)
+                        
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack{
+                                ForEach(ServiceCategory.allCases) { category in
+                                    Button(action: {
+                                        viewModel.selectCategory(category)
+                                    }) {
+                                        Text(category.rawValue)
+                                            .padding(.horizontal, 15)
+                                            .padding(.vertical, 8)
+                                            .background(viewModel.selectedServiceCategory == category ? Color.blue : Color.gray.opacity(0.2))
+                                            .foregroundColor(viewModel.selectedServiceCategory == category ? .white : .black)
+                                            .cornerRadius(10)
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                        }
+                                                
+                        // Servis listesi
+                        ScrollView {
+                            LazyVStack(spacing: 10) {
+                                ForEach(viewModel.filteredServices) { service in
+                                    ServiceRow(service: service)
+                                        .padding(.horizontal)
+                                }
+                            }
+                        }
+                        .frame(height: 300) // Sabit bir yükseklik verdik
                     }
                     
                 }
@@ -185,11 +215,41 @@ struct HomeContentView: View {
             }
             .navigationBarBackButtonHidden(true)
         }
-
-        
         
     }
     
+}
+
+struct ServiceRow: View {
+    var service: Services
+    
+    var body: some View {
+        HStack {
+            Image(service.imageName)
+                .resizable()
+                .frame(width: 80, height: 80)
+                .cornerRadius(10)
+
+            VStack(alignment: .leading) {
+                Text(service.name)
+                    .font(.headline)
+                HStack {
+                    Text("$\(service.price)")
+                        .font(.headline)
+                        .foregroundColor(.blue)
+                    Text("/night")
+                        .foregroundColor(.gray)
+                }
+            }
+            Spacer()
+            HStack {
+                Image(systemName: "star.fill")
+                    .foregroundColor(.yellow)
+                Text(String(format: "%.1f", service.rating))
+            }
+        }
+        .padding(.vertical, 8)
+    }
 }
 
 #Preview {
