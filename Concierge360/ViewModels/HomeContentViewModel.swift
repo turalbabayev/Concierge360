@@ -31,19 +31,23 @@ class HomeContentViewModel: ObservableObject {
     }
     
     func selectCategory(_ category: ServiceCategory) {
-        selectedServiceCategory = category
-        filterServices()
+        withAnimation {
+            selectedServiceCategory = category
+            filterServices()
+        }
     }
     
     func filterServices() {
         let services = if selectedServiceCategory == .all {
-            allServices // Tüm servisler
+            // All kategorisi için rastgele 3 servis seç
+            allServices.shuffled().prefix(3)
         } else {
-            allServices.filter { $0.category == selectedServiceCategory } // Kategori bazlı servisler
+            // Belirli kategori için filtreleme
+            allServices.filter { $0.category == selectedServiceCategory }.prefix(3)
         }
         
-        // Her durumda sadece ilk 3 servisi al
-        filteredServices = Array(services.prefix(3))
+        // Servisleri ata
+        filteredServices = Array(services)
     }
     
     // Yeni fonksiyonlar
