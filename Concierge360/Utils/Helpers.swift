@@ -60,13 +60,16 @@ struct CustomNavigationBar: View {
             HStack(spacing: 0) {
                 // Leading - Sol kısım (Geri butonu)
                 Button(action: {
-                    dismiss()
+                    withAnimation {
+                        dismiss()
+                    }
                 }) {
                     Image(systemName: "chevron.left")
                         .font(.title2)
                         .foregroundColor(color)
                 }
-                .frame(width: 44)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
                 
                 // Middle - Orta kısım (Başlık veya metin)
                 if let title = title {

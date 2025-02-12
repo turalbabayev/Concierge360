@@ -127,9 +127,9 @@ private struct PopularToursSection: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
-                    ForEach(tourList) { card in
-                        NavigationLink(destination: LoginView()) {
-                            TourCardView(card: card)
+                    ForEach(tourList) { tour in
+                        NavigationLink(destination: TourDetailView(tour: tour)) {
+                            TourCardView(card: tour)
                         }
                     }
                 }
