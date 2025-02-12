@@ -1,158 +1,153 @@
 import SwiftUI
 
 struct TourDetailView: View {
-    let tour: Tour
+    @StateObject private var viewModel: TourDetailViewModel
     @Environment(\.dismiss) private var dismiss
-    @State private var scrollOffset: CGFloat = .zero
-    @State private var selectedImageIndex = 0
-    @State private var isDarkImage: Bool = false
-    @State private var showGallery = false
-    @State private var showFullMap = false
     
-    var images: [String] {
-        tour.gallery.isEmpty ? [tour.image] : tour.gallery
+    init(tour: Tour) {
+        _viewModel = StateObject(wrappedValue: TourDetailViewModel(tour: tour))
     }
     
     var body: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            VStack(spacing: 0) {
-                // MARK: - Hero Section
-                ZStack(alignment: .bottomTrailing) {
-                    // Image Gallery
-                    TabView(selection: $selectedImageIndex) {
-                        ForEach(images, id: \.self) { image in
-                            Image(image)
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(height: 350)
-                                .clipped()
-                                .onTapGesture {
-                                    withAnimation(.spring()) {
-                                        showGallery = true
+        ZStack(alignment: .bottom) {
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(spacing: 0) {
+                    // MARK: - Hero Section
+                    ZStack(alignment: .bottomTrailing) {
+                        // Image Gallery
+                        TabView(selection: $viewModel.selectedImageIndex) {
+                            ForEach(viewModel.images.indices, id: \.self) { index in
+                                Image(viewModel.images[index])
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(height: 350)
+                                    .clipped()
+                                    .overlay(
+                                        LinearGradient(
+                                            colors: [.black.opacity(0.4), .clear],
+                                            startPoint: .top,
+                                            endPoint: .center
+                                        )
+                                    )
+                                    .onTapGesture {
+                                        viewModel.showGallery = true
                                     }
-                                }
+                            }
                         }
-                    }
-                    .tabViewStyle(.page(indexDisplayMode: .never))
-                    .frame(height: 350)
-                    
-                    // Image Counter
-                    Text("\(selectedImageIndex + 1)/\(tour.gallery.isEmpty ? 1 : tour.gallery.count)")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(.ultraThinMaterial)
-                        .clipShape(Capsule())
-                        .padding(.bottom, 35)
-                        .padding(.trailing, 16)
-                }
-                
-                // MARK: - Content Section
-                VStack(alignment: .leading, spacing: 24) {
-                    // Header
-                    VStack(alignment: .leading, spacing: 16) {
-                        HStack {
-                            Text(tour.title)
-                                .font(.system(size: 22, weight: .bold))
-                            Spacer()
-                            PriceTag(price: tour.price)
-                        }
+                        .tabViewStyle(.page(indexDisplayMode: .never))
+                        .frame(height: 350)
                         
-                        HStack(spacing: 16) {
-                            InfoBadge(icon: "clock", text: tour.duration)
-                            RatingBadge(rating: tour.rating)
+                        // Image Counter
+                        if viewModel.images.count > 1 {
+                            Text("\(viewModel.selectedImageIndex + 1)/\(viewModel.images.count)")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(Color.black.opacity(0.6))
+                                .clipShape(Capsule())
+                                .padding(.bottom, 45)
+                                .padding(.trailing, 16)
                         }
                     }
+                    .ignoresSafeArea(edges: .top)
                     
-                    if !tour.shortDescription.isEmpty {
-                        DescriptionSection(title: "About", content: tour.shortDescription)
-                    }
-                    
-                    if !tour.tourProgram.isEmpty {
-                        TourProgramSection(program: tour.tourProgram)
-                        
-                        // Program rotası haritası
-                        VStack(alignment: .leading, spacing: 12) {
+                    // MARK: - Content Section
+                    VStack(alignment: .leading, spacing: 24) {
+                        // Header
+                        VStack(alignment: .leading, spacing: 16) {
                             HStack {
-                                Text("Tour Route")
-                                    .font(.system(size: 18, weight: .semibold))
+                                Text(viewModel.tour.title)
+                                    .font(.system(size: 22, weight: .bold))
                                 Spacer()
-                                Button(action: {
-                                    withAnimation {
-                                        showFullMap = true
-                                    }
-                                }) {
-                                    Image(systemName: "arrow.up.left.and.arrow.down.right")
-                                        .font(.system(size: 16, weight: .medium))
-                                        .foregroundColor(.gray)
-                                        .padding(8)
-                                        .background(Color.gray.opacity(0.1))
-                                        .clipShape(Circle())
-                                }
+                                PriceTag(price: viewModel.tour.price)
                             }
                             
-                            TourMapView(places: tour.tourProgram.map { $0.location })
-                                .frame(height: 200)
-                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                            HStack(spacing: 16) {
+                                InfoBadge(icon: "clock", text: viewModel.tour.duration)
+                                RatingBadge(rating: viewModel.tour.rating)
+                            }
+                        }
+                        
+                        if !viewModel.tour.shortDescription.isEmpty {
+                            DescriptionSection(title: "About", content: viewModel.tour.shortDescription)
+                        }
+                        
+                        if let schedule = viewModel.tour.schedule {
+                            TourScheduleSection(schedule: schedule)
+                        }
+                        
+                        if !viewModel.tour.tourProgram.isEmpty {
+                            TourProgramSection(program: viewModel.tour.tourProgram)
+                            
+                            // Program rotası haritası
+                            VStack(alignment: .leading, spacing: 12) {
+                                HStack {
+                                    Text("Tour Route")
+                                        .font(.system(size: 18, weight: .semibold))
+                                    Spacer()
+                                    Button(action: {
+                                        viewModel.showFullMap = true
+                                    }) {
+                                        Image(systemName: "arrow.up.left.and.arrow.down.right")
+                                            .font(.system(size: 16, weight: .medium))
+                                            .foregroundColor(.gray)
+                                            .padding(8)
+                                            .background(Color.gray.opacity(0.1))
+                                            .clipShape(Circle())
+                                    }
+                                }
+                                
+                                TourMapView(places: viewModel.tour.tourProgram.map { $0.location })
+                                    .frame(height: 200)
+                                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                            }
+                        }
+                        
+                        if let included = viewModel.tour.includedServices, !included.isEmpty {
+                            ServicesList.included(items: included)
+                        }
+                        
+                        if let excluded = viewModel.tour.excludedServices, !excluded.isEmpty {
+                            ServicesList.excluded(items: excluded)
                         }
                     }
-                    
-                    if let included = tour.includedServices, !included.isEmpty {
-                        ServicesList(title: "What's Included", items: included, iconName: "checkmark.circle.fill")
-                    }
-                    
-                    if let excluded = tour.excludedServices, !excluded.isEmpty {
-                        ServicesList(title: "What's Not Included", items: excluded, iconName: "xmark.circle.fill")
-                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 24)
+                    .padding(.bottom, 100)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 30))
+                    .offset(y: -25)
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 24)
-                .padding(.bottom, 100)
-                .background(Color.white)
-                .clipShape(RoundedRectangle(cornerRadius: 30))
-                .offset(y: -25)
+            }
+            .ignoresSafeArea()
+            
+            // Book Now Button
+            VStack(spacing: 0) {
+                Divider()
+                BookNowButton(tour: viewModel.tour)
+                    .background(Color.white)
             }
         }
         .overlay(alignment: .top) {
             CustomNavigationBar(
-                title: tour.title,
+                title: viewModel.tour.title,
                 color: .white
             )
-            .padding(.top, 48)
-            .zIndex(2)
         }
-        .overlay(alignment: .bottom) {
-            VStack(spacing: 0) {
-                Divider()
-                BookNowButton(price: tour.price)
-                    .background(Color.white)
-            }
-        }
-        .edgesIgnoringSafeArea(.all)
         .navigationBarHidden(true)
-        .background(Color.white)
-        .onAppear {
-            // Burada resmin rengini analiz edip isDarkImage'i ayarlayabiliriz
-            // UIImage(named: tour.image)?.averageBrightness() gibi
+        .sheet(isPresented: $viewModel.showGallery) {
+            ImageGalleryView(
+                images: viewModel.images,
+                selectedIndex: viewModel.selectedImageIndex,
+                isPresented: $viewModel.showGallery
+            )
         }
-        .overlay {
-            if showGallery {
-                ImageGalleryView(
-                    images: images,
-                    selectedIndex: selectedImageIndex,
-                    isPresented: $showGallery
-                )
-                .transition(.opacity.animation(.easeInOut))
-            }
-            
-            if showFullMap {
-                FullScreenMapView(
-                    places: tour.tourProgram.map { $0.location },
-                    isPresented: $showFullMap
-                )
-                .transition(.opacity.animation(.easeInOut))
-            }
+        .sheet(isPresented: $viewModel.showFullMap) {
+            FullScreenMapView(
+                places: viewModel.tour.tourProgram.map { $0.location },
+                isPresented: $viewModel.showFullMap
+            )
         }
     }
 }
@@ -350,12 +345,10 @@ private struct ProgramItem: View {
 }
 
 private struct BookNowButton: View {
-    let price: String
+    let tour: Tour
     
     var body: some View {
-        Button(action: {
-            // Booking action
-        }) {
+        NavigationLink(destination: TourBookingView(tour: tour)) {
             Text("Book Now")
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundColor(.white)
@@ -369,10 +362,123 @@ private struct BookNowButton: View {
     }
 }
 
+private struct TourScheduleSection: View {
+    let schedule: TourSchedule
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Schedule Information")
+                .font(.system(size: 18, weight: .semibold))
+            
+            VStack(alignment: .leading, spacing: 20) {
+                // Time Info
+                HStack(spacing: 32) {
+                    // Start Time
+                    timeInfoView(
+                        icon: "clock",
+                        title: "Start Time",
+                        time: schedule.startTime
+                    )
+                    
+                    if let endTime = schedule.endTime {
+                        Divider()
+                            .frame(height: 40)
+                            .padding(.horizontal, 8)
+                        
+                        // End Time
+                        timeInfoView(
+                            icon: "clock.fill",
+                            title: "End Time",
+                            time: endTime
+                        )
+                    }
+                    
+                    Spacer(minLength: 0)
+                }
+                
+                // Available Days
+                if let days = schedule.availableDays {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Label {
+                            Text("Available Days")
+                                .font(.system(size: 14))
+                                .foregroundColor(.gray)
+                        } icon: {
+                            Image(systemName: "calendar")
+                                .foregroundColor(.mainColor)
+                        }
+                        
+                        HStack(spacing: 8) {
+                            ForEach(WeekDay.allCases, id: \.self) { day in
+                                dayIndicator(day: day, isAvailable: days.contains(day))
+                            }
+                        }
+                    }
+                    .padding(.top, 4)
+                }
+                
+                // Notes
+                if let notes = schedule.notes {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label {
+                            Text("Notes")
+                                .font(.system(size: 14))
+                                .foregroundColor(.gray)
+                        } icon: {
+                            Image(systemName: "info.circle.fill")
+                                .foregroundColor(.mainColor)
+                        }
+                        
+                        Text(notes)
+                            .font(.system(size: 14))
+                            .foregroundColor(.gray)
+                            .lineSpacing(4)
+                            .padding(.leading, 24)
+                    }
+                    .padding(.top, 4)
+                }
+            }
+            .padding(20)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.gray.opacity(0.05))
+            )
+        }
+    }
+    
+    private func timeInfoView(icon: String, title: String, time: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label {
+                Text(title)
+                    .font(.system(size: 14))
+                    .foregroundColor(.gray)
+            } icon: {
+                Image(systemName: icon)
+                    .foregroundColor(.mainColor)
+            }
+            
+            Text(time)
+                .font(.system(size: 16, weight: .medium))
+                .padding(.leading, 24)
+        }
+    }
+    
+    private func dayIndicator(day: WeekDay, isAvailable: Bool) -> some View {
+        Text(day.rawValue.prefix(3))
+            .font(.system(size: 12, weight: .medium))
+            .foregroundColor(isAvailable ? .white : .gray)
+            .frame(width: 35, height: 35)
+            .background(
+                Circle()
+                    .fill(isAvailable ? Color.mainColor : Color.gray.opacity(0.1))
+            )
+    }
+}
+
 #Preview {
     TourDetailView(tour: .init(
         title: "The Horizon Retreat",
-        price: "From/$100",
+        price: "$100",
         rating: 4.5,
         duration: "3 Hours",
         image: "buta-vip",
@@ -420,7 +526,12 @@ private struct BookNowButton: View {
                 )
             )
         ],
-        startTime: "09:00",
+        schedule: TourSchedule(
+            startTime: "09:00",
+            endTime: "17:00",
+            availableDays: [.monday, .wednesday, .friday],
+            notes: "Tour not available on public holidays"
+        ),
         meetingPoint: "Hotel Lobby",
         includedServices: [
             "Luxury vehicle",

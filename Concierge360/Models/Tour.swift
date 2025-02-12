@@ -17,7 +17,7 @@ struct Tour: Identifiable {
     let gallery: [String]
     let shortDescription: String
     let tourProgram: [TourProgramItem]
-    let startTime: String?
+    let schedule: TourSchedule?
     let meetingPoint: String?
     let includedServices: [String]?
     let excludedServices: [String]?
@@ -39,10 +39,27 @@ struct TourProgramItem: Identifiable {
     let location: Place
 }
 
+struct TourSchedule {
+    let startTime: String
+    let endTime: String?
+    let availableDays: [WeekDay]?
+    let notes: String?
+}
+
+enum WeekDay: String, CaseIterable {
+    case monday = "Monday"
+    case tuesday = "Tuesday"
+    case wednesday = "Wednesday"
+    case thursday = "Thursday"
+    case friday = "Friday"
+    case saturday = "Saturday"
+    case sunday = "Sunday"
+}
+
 var tourList: [Tour] = [
     .init(
         title: "The Horizon Retreat",
-        price: "From/$100",
+        price: "$100",
         rating: 4.5,
         duration: "3 Hours",
         image: "buta-vip",
@@ -90,7 +107,12 @@ var tourList: [Tour] = [
                 )
             )
         ],
-        startTime: "09:00",
+        schedule: TourSchedule(
+            startTime: "09:00",
+            endTime: "17:00",
+            availableDays: [.monday, .wednesday, .friday, .saturday],
+            notes: "Not available on public holidays"
+        ),
         meetingPoint: "Hotel Lobby",
         includedServices: [
             "Luxury vehicle",
@@ -107,14 +129,19 @@ var tourList: [Tour] = [
     ),
     .init(
         title: "Panorama of the Bosporus",
-        price: "From/$30",
+        price: "$30",
         rating: 4.5,
         duration: "3 Hours",
         image: "Panorama of the Bosporus",
         gallery: ["Panorama of the Bosporus", "Panorama of the Bosporus", "Panorama of the Bosporus"],
         shortDescription: "Discover the beauty of Istanbul's Bosphorus strait with our panoramic tour, offering breathtaking views of two continents.",
         tourProgram: [],
-        startTime: "14:00",
+        schedule: TourSchedule(
+            startTime: "14:00",
+            endTime: "17:00",
+            availableDays: [.monday, .tuesday, .wednesday, .thursday, .friday],
+            notes: "Weather dependent tour"
+        ),
         meetingPoint: "Eminönü Pier",
         includedServices: [
             "Boat tour",
@@ -140,14 +167,19 @@ var tourList: [Tour] = [
     ),
     .init(
         title: "Panoramıc Istanbul",
-        price: "From/$90",
+        price: "$90",
         rating: 4.5,
         duration: "3 Hours",
         image: "Panoramıc Istanbul",
         gallery: ["Panoramıc Istanbul", "Panoramıc Istanbul", "Panoramıc Istanbul"],
         shortDescription: "Experience Istanbul from the best viewpoints, capturing the city's magnificent skyline and historical landmarks.",
         tourProgram: [],
-        startTime: "10:00",
+        schedule: TourSchedule(
+            startTime: "10:00",
+            endTime: "15:00",
+            availableDays: [.tuesday, .thursday, .saturday, .sunday],
+            notes: nil
+        ),
         meetingPoint: "Sultanahmet Square",
         includedServices: [
             "Transportation",
@@ -173,14 +205,19 @@ var tourList: [Tour] = [
     ),
     .init(
         title: "Turkish Hamam Tour",
-        price: "From/$40",
+        price: "$40",
         rating: 4.5,
         duration: "3 Hours",
         image: "turkishhamam",
         gallery: ["turkishhamam", "turkishhamam", "turkishhamam"],
         shortDescription: "Immerse yourself in the traditional Turkish bath experience, a centuries-old ritual of relaxation and rejuvenation.",
         tourProgram: [],
-        startTime: "13:00",
+        schedule: TourSchedule(
+            startTime: "13:00",
+            endTime: "16:00",
+            availableDays: [.monday, .wednesday, .friday, .saturday, .sunday],
+            notes: "Last entry 2 hours before closing"
+        ),
         meetingPoint: "Hamam Entrance",
         includedServices: [
             "Traditional bath service",
@@ -212,7 +249,12 @@ extension Tour {
         gallery: ["bosphorus1", "bosphorus2", "bosphorus3"],
         shortDescription: "Experience the magic of Istanbul from the water as you cruise between two continents on a 2.5-hour sunset cruise along the Bosphorus Strait.",
         tourProgram: [],
-        startTime: "17:30",
+        schedule: TourSchedule(
+            startTime: "17:30",
+            endTime: "20:00",
+            availableDays: [.monday, .wednesday, .friday, .saturday],
+            notes: "Sunset timing may vary by season"
+        ),
         meetingPoint: "Kabataş Pier",
         includedServices: [
             "Professional guide",
