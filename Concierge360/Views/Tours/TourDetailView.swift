@@ -7,6 +7,7 @@ struct TourDetailView: View {
     @State private var selectedImageIndex = 0
     @State private var isDarkImage: Bool = false
     @State private var showGallery = false
+    @State private var showFullMap = false
     
     var images: [String] {
         tour.gallery.isEmpty ? [tour.image] : tour.gallery
@@ -73,8 +74,24 @@ struct TourDetailView: View {
                         
                         // Program rotası haritası
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Tour Route")
-                                .font(.system(size: 18, weight: .semibold))
+                            HStack {
+                                Text("Tour Route")
+                                    .font(.system(size: 18, weight: .semibold))
+                                Spacer()
+                                Button(action: {
+                                    withAnimation {
+                                        showFullMap = true
+                                    }
+                                }) {
+                                    Image(systemName: "arrow.up.left.and.arrow.down.right")
+                                        .font(.system(size: 16, weight: .medium))
+                                        .foregroundColor(.gray)
+                                        .padding(8)
+                                        .background(Color.gray.opacity(0.1))
+                                        .clipShape(Circle())
+                                }
+                            }
+                            
                             TourMapView(places: tour.tourProgram.map { $0.location })
                                 .frame(height: 200)
                                 .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -125,6 +142,14 @@ struct TourDetailView: View {
                     images: images,
                     selectedIndex: selectedImageIndex,
                     isPresented: $showGallery
+                )
+                .transition(.opacity.animation(.easeInOut))
+            }
+            
+            if showFullMap {
+                FullScreenMapView(
+                    places: tour.tourProgram.map { $0.location },
+                    isPresented: $showFullMap
                 )
                 .transition(.opacity.animation(.easeInOut))
             }
@@ -345,5 +370,69 @@ private struct BookNowButton: View {
 }
 
 #Preview {
-    TourDetailView(tour: .example)
+    TourDetailView(tour: .init(
+        title: "The Horizon Retreat",
+        price: "From/$100",
+        rating: 4.5,
+        duration: "3 Hours",
+        image: "buta-vip",
+        gallery: ["buta-vip", "buta-vip", "buta-vip"],
+        shortDescription: "Experience luxury and comfort with our VIP retreat service. Perfect for those seeking an exclusive and memorable journey.",
+        tourProgram: [
+            TourProgramItem(
+                title: "Dolmabahçe Palace",
+                description: "Visit the magnificent Dolmabahce Palace, home to Ottoman sultans. Explore the grand halls and beautiful gardens of this historic palace.",
+                location: Place(
+                    name: "Dolmabahçe Palace",
+                    latitude: 41.0392,
+                    longitude: 29.0007,
+                    description: "Ottoman palace with stunning architecture"
+                )
+            ),
+            TourProgramItem(
+                title: "Bosphorus Bridge",
+                description: "Cross between two continents and enjoy panoramic views of Istanbul. Perfect photo opportunity of the city's unique geography.",
+                location: Place(
+                    name: "Bosphorus Bridge",
+                    latitude: 41.0451,
+                    longitude: 29.0341,
+                    description: "Bridge connecting Europe and Asia"
+                )
+            ),
+            TourProgramItem(
+                title: "Çamlıca Hill",
+                description: "Enjoy lunch with breathtaking city views. The highest point in Istanbul offering 360-degree panoramic views of the city and Bosphorus.",
+                location: Place(
+                    name: "Çamlıca Hill",
+                    latitude: 41.0278,
+                    longitude: 29.0717,
+                    description: "Highest point in Istanbul"
+                )
+            ),
+            TourProgramItem(
+                title: "Maiden's Tower",
+                description: "Visit the legendary tower and learn its history. This historic tower sits at the confluence of the Bosphorus strait, offering unique views.",
+                location: Place(
+                    name: "Maiden's Tower",
+                    latitude: 41.0211,
+                    longitude: 29.0041,
+                    description: "Historic tower on a small islet"
+                )
+            )
+        ],
+        startTime: "09:00",
+        meetingPoint: "Hotel Lobby",
+        includedServices: [
+            "Luxury vehicle",
+            "Professional guide",
+            "Entrance fees",
+            "Lunch"
+        ],
+        excludedServices: [
+            "Personal expenses",
+            "Additional activities",
+            "Gratuities"
+        ],
+        visitingPlaces: nil
+    ))
 }

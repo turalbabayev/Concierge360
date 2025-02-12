@@ -63,7 +63,7 @@ struct ImageGalleryView: View {
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 8)
-                                .background(.ultraThinMaterial)
+                                .background(.ultraThinMaterial.opacity(0.7))
                                 .clipShape(Capsule())
                         }
                         .padding(.horizontal, 20)
@@ -175,8 +175,9 @@ private struct ImageStrip: View {
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .stroke(selectedIndex == index ? Color.white : Color.clear, lineWidth: 2)
+                                    .stroke(selectedIndex == index ? .white : .clear, lineWidth: 2)
                             )
+                            .opacity(selectedIndex == index ? 1 : 0.7)
                             .onTapGesture {
                                 withAnimation {
                                     selectedIndex = index
@@ -193,6 +194,9 @@ private struct ImageStrip: View {
                 }
             }
         }
-        .background(.ultraThinMaterial)
+        .background(
+            Color.black.opacity(0.3)
+                .background(.ultraThinMaterial.opacity(0.5))
+        )
     }
 } 
