@@ -74,7 +74,7 @@ struct TourDetailView: View {
                         }
                         
                         if let schedule = viewModel.tour.schedule {
-                            TourScheduleSection(schedule: schedule)
+                            scheduleSection
                         }
                         
                         if !viewModel.tour.tourProgram.isEmpty {
@@ -149,6 +149,114 @@ struct TourDetailView: View {
                 isPresented: $viewModel.showFullMap
             )
         }
+    }
+    
+    private var scheduleSection: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            Text("Schedule")
+                .font(.system(size: 18, weight: .semibold))
+            
+            if let schedule = viewModel.tour.schedule {
+                VStack(spacing: 24) {
+                    // Available Days
+                    if let availableDays = schedule.availableDays {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Available Days")
+                                .font(.system(size: 14))
+                                .foregroundColor(.gray)
+                            
+                            HStack(spacing: 8) {
+                                ForEach(WeekDay.allCases, id: \.self) { day in
+                                    let isAvailable = availableDays.contains(day)
+                                    Text(day.rawValue.prefix(3))
+                                        .font(.system(size: 12, weight: .medium))
+                                        .foregroundColor(isAvailable ? .mainColor : .gray.opacity(0.5))
+                                        .frame(width: 35, height: 35)
+                                        .background(
+                                            Circle()
+                                                .fill(isAvailable ? Color.mainColor.opacity(0.1) : Color.gray.opacity(0.1))
+                                        )
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Tour Sessions
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Available Sessions")
+                            .font(.system(size: 14))
+                            .foregroundColor(.gray)
+                        
+                        VStack(spacing: 12) {
+                            ForEach(schedule.sessions) { session in
+                                HStack(alignment: .center, spacing: 12) {
+                                    // Time Container
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "clock.fill")
+                                            .font(.system(size: 12))
+                                            .foregroundColor(.mainColor)
+                                        
+                                        Text("\(session.startTime)")
+                                            .font(.system(size: 13))
+                                            .foregroundColor(.gray)
+                                        
+                                        Text("-")
+                                            .font(.system(size: 13))
+                                            .foregroundColor(.gray)
+                                        
+                                        Text("\(session.endTime)")
+                                            .font(.system(size: 13))
+                                            .foregroundColor(.gray)
+                                    }
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(Color.mainColor.opacity(0.1))
+                                    .clipShape(Capsule())
+                                    
+                                    if let title = session.title {
+                                        Text(title)
+                                            .font(.system(size: 14, weight: .medium))
+                                            .lineLimit(1)
+                                    }
+                                    
+                                    Spacer(minLength: 0)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 10)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color.gray.opacity(0.05))
+                                )
+                            }
+                        }
+                    }
+                    
+                    // Notes
+                    if let notes = schedule.notes {
+                        HStack(spacing: 8) {
+                            Image(systemName: "info.circle.fill")
+                                .foregroundColor(.orange)
+                            Text(notes)
+                                .font(.system(size: 14))
+                                .foregroundColor(.gray)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.orange.opacity(0.1))
+                        )
+                    }
+                }
+            }
+        }
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.gray.opacity(0.05))
+        )
     }
 }
 
@@ -362,127 +470,14 @@ private struct BookNowButton: View {
     }
 }
 
-private struct TourScheduleSection: View {
-    let schedule: TourSchedule
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Schedule Information")
-                .font(.system(size: 18, weight: .semibold))
-            
-            VStack(alignment: .leading, spacing: 20) {
-                // Time Info
-                HStack(spacing: 32) {
-                    // Start Time
-                    timeInfoView(
-                        icon: "clock",
-                        title: "Start Time",
-                        time: schedule.startTime
-                    )
-                    
-                    if let endTime = schedule.endTime {
-                        Divider()
-                            .frame(height: 40)
-                            .padding(.horizontal, 8)
-                        
-                        // End Time
-                        timeInfoView(
-                            icon: "clock.fill",
-                            title: "End Time",
-                            time: endTime
-                        )
-                    }
-                    
-                    Spacer(minLength: 0)
-                }
-                
-                // Available Days
-                if let days = schedule.availableDays {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label {
-                            Text("Available Days")
-                                .font(.system(size: 14))
-                                .foregroundColor(.gray)
-                        } icon: {
-                            Image(systemName: "calendar")
-                                .foregroundColor(.mainColor)
-                        }
-                        
-                        HStack(spacing: 8) {
-                            ForEach(WeekDay.allCases, id: \.self) { day in
-                                dayIndicator(day: day, isAvailable: days.contains(day))
-                            }
-                        }
-                    }
-                    .padding(.top, 4)
-                }
-                
-                // Notes
-                if let notes = schedule.notes {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Label {
-                            Text("Notes")
-                                .font(.system(size: 14))
-                                .foregroundColor(.gray)
-                        } icon: {
-                            Image(systemName: "info.circle.fill")
-                                .foregroundColor(.mainColor)
-                        }
-                        
-                        Text(notes)
-                            .font(.system(size: 14))
-                            .foregroundColor(.gray)
-                            .lineSpacing(4)
-                            .padding(.leading, 24)
-                    }
-                    .padding(.top, 4)
-                }
-            }
-            .padding(20)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.gray.opacity(0.05))
-            )
-        }
-    }
-    
-    private func timeInfoView(icon: String, title: String, time: String) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Label {
-                Text(title)
-                    .font(.system(size: 14))
-                    .foregroundColor(.gray)
-            } icon: {
-                Image(systemName: icon)
-                    .foregroundColor(.mainColor)
-            }
-            
-            Text(time)
-                .font(.system(size: 16, weight: .medium))
-                .padding(.leading, 24)
-        }
-    }
-    
-    private func dayIndicator(day: WeekDay, isAvailable: Bool) -> some View {
-        Text(day.rawValue.prefix(3))
-            .font(.system(size: 12, weight: .medium))
-            .foregroundColor(isAvailable ? .white : .gray)
-            .frame(width: 35, height: 35)
-            .background(
-                Circle()
-                    .fill(isAvailable ? Color.mainColor : Color.gray.opacity(0.1))
-            )
-    }
-}
-
 #Preview {
     TourDetailView(tour: .init(
         title: "The Horizon Retreat",
         price: "$100",
         rating: 4.5,
         duration: "3 Hours",
-        image: "buta-vip",
-        gallery: ["buta-vip", "buta-vip", "buta-vip"],
+        image: "topkapipalace",
+        gallery: ["topkapipalace", "hagiairene", "bluemosque"],
         shortDescription: "Experience luxury and comfort with our VIP retreat service. Perfect for those seeking an exclusive and memorable journey.",
         tourProgram: [
             TourProgramItem(
@@ -527,9 +522,14 @@ private struct TourScheduleSection: View {
             )
         ],
         schedule: TourSchedule(
-            startTime: "09:00",
-            endTime: "17:00",
             availableDays: [.monday, .wednesday, .friday],
+            sessions: [
+                TourSession(
+                    startTime: "09:00",
+                    endTime: "17:00",
+                    title: "Full Day Tour"
+                )
+            ],
             notes: "Tour not available on public holidays"
         ),
         meetingPoint: "Hotel Lobby",

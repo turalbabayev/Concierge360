@@ -17,11 +17,14 @@ class TourBookingViewModel: ObservableObject {
     @Published var showError = false
     @Published var errorMessage = ""
     @Published var showingErrors = false
+    @Published var showBookingConfirmation = false
+    @Published var selectedSession: TourSession? // Seçilen seans
     
     init(tour: Tour) {
         self.tour = tour
-        // İlk müsait tarihi bulup selectedDate'i onunla başlatıyoruz
         self.selectedDate = Self.findFirstAvailableDate(for: tour)
+        // Varsayılan olarak ilk seansı seç
+        self.selectedSession = tour.schedule?.sessions.first
     }
     
     // İlk müsait tarihi bulan static helper fonksiyon
@@ -100,18 +103,16 @@ class TourBookingViewModel: ObservableObject {
     
     // MARK: - Form Validation
     var isFormValid: Bool {
-        // Temel bilgiler kontrolü
         let isBasicInfoValid = !fullName.isEmpty && 
             !roomNumbers.contains(where: { $0.isEmpty }) &&
-            !phoneNumber.isEmpty &&
-            !email.isEmpty
+            !phoneNumber.isEmpty
         
-        // Misafir isimleri kontrolü (ilk misafir kendisi olduğu için kontrol etmiyoruz)
         let areGuestNamesValid = numberOfPeople == 1 || 
             !guestNames.dropFirst().contains(where: { $0.isEmpty })
         
-        // Tarih kontrolü - seçili tarih her zaman müsait bir tarih olacak
-        return isBasicInfoValid && areGuestNamesValid
+        let isSessionSelected = selectedSession != nil
+        
+        return isBasicInfoValid && areGuestNamesValid && isSessionSelected
     }
     
     func validateField(_ text: String) -> Bool {
@@ -139,15 +140,15 @@ class TourBookingViewModel: ObservableObject {
             return
         }
         
-        if email.isEmpty {
-            showError = true
-            errorMessage = "Please enter your email"
-            return
-        }
-        
         if numberOfPeople > 1 && guestNames.dropFirst().contains(where: { $0.isEmpty }) {
             showError = true
             errorMessage = "Please enter all guest names"
+            return
+        }
+        
+        if selectedSession == nil {
+            showError = true
+            errorMessage = "Please select a tour time"
             return
         }
     }
@@ -195,6 +196,27 @@ class TourBookingViewModel: ObservableObject {
         return .primary
     }
     
+    var bookingDetails: BookingDetails {
+        let sessionTimeText: String
+        if let session = selectedSession {
+            if let title = session.title {
+                sessionTimeText = "\(title) (\(session.startTime) - \(session.endTime))"
+            } else {
+                sessionTimeText = "\(session.startTime) - \(session.endTime)"
+            }
+        } else {
+            sessionTimeText = "Not selected"
+        }
+        
+        return BookingDetails(
+            tourName: tour.title,
+            date: selectedDate.formatted(date: .long, time: .omitted),
+            numberOfPeople: numberOfPeople,
+            totalPrice: totalPrice,
+            sessionTime: sessionTimeText
+        )
+    }
+    
     // MARK: - Booking Actions
     func completeBooking() {
         // Eğer seçili tarih müsait değilse, ilk müsait tarihe otomatik geç
@@ -228,8 +250,7 @@ class TourBookingViewModel: ObservableObject {
         print("\nTotal Price: \(totalPrice)")
         print("============================\n")
         
-        // Burada API çağrısı yapılacak
-        // showError = true
-        // errorMessage = "Booking failed"
+        // Booking confirmation alert'ını göster
+        showBookingConfirmation = true
     }
 } 

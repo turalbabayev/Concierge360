@@ -5,6 +5,7 @@ struct TourBookingView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var hotelManager: HotelManager
     @FocusState private var focusedField: Field?
+    @Environment(\.presentationMode) var presentationMode
     
     enum Field {
         case fullName, roomNumber, phone, email, guestName
@@ -40,6 +41,17 @@ struct TourBookingView: View {
         .onAppear {
             viewModel.setHotelManager(hotelManager)
         }
+        .overlay {
+            if viewModel.showBookingConfirmation {
+                CustomAlertView(
+                    bookingDetails: viewModel.bookingDetails,
+                    isPresented: $viewModel.showBookingConfirmation
+                ) {
+                    // Ana sayfaya dön
+                    presentationMode.wrappedValue.dismiss()
+                }
+            }
+        }
     }
     
     // MARK: - View Components
@@ -50,6 +62,7 @@ struct TourBookingView: View {
                 if viewModel.numberOfPeople > 1 { guestNamesSection }
                 hotelInformationSection
                 dateSelectionSection
+                tourSessionSection
                 contactInformationSection
             }
             .padding(20)
@@ -274,6 +287,44 @@ struct TourBookingView: View {
         }
     }
     
+    private var tourSessionSection: some View {
+        FormSection(title: "Tour Time") {
+            VStack(alignment: .leading, spacing: 16) {
+                ForEach(viewModel.tour.schedule?.sessions ?? []) { session in
+                    Button(action: {
+                        viewModel.selectedSession = session
+                    }) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                if let title = session.title {
+                                    Text(title)
+                                        .font(.system(size: 16, weight: .medium))
+                                }
+                                Text("\(session.startTime) - \(session.endTime)")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.gray)
+                            }
+                            
+                            Spacer()
+                            
+                            if viewModel.selectedSession?.id == session.id {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.mainColor)
+                            }
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(viewModel.selectedSession?.id == session.id ? 
+                                     Color.mainColor.opacity(0.1) : Color.gray.opacity(0.05))
+                        )
+                    }
+                }
+            }
+        }
+    }
+    
     // Helper functions for date styling
     private func backgroundColor(for date: Date, isAvailable: Bool, isSelected: Bool, isToday: Bool) -> Color {
         if isSelected {
@@ -310,11 +361,11 @@ struct TourBookingView: View {
                 .focused($focusedField, equals: .phone)
                 
                 ValidatedTextField(
-                    title: "Email",
+                    title: "Email (Optional)",
                     text: $viewModel.email,
-                    placeholder: "Enter your email",
-                    isValid: !viewModel.showingErrors || viewModel.validateField(viewModel.email),
-                    errorMessage: "Email is required",
+                    placeholder: "Enter your email (optional)",
+                    isValid: true,
+                    errorMessage: "",
                     type: .email
                 )
                 .focused($focusedField, equals: .email)
@@ -337,6 +388,12 @@ struct TourBookingView: View {
                 Spacer()
                 
                 Button(action: {
+                    // Klavyeyi kapat
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), 
+                                                  to: nil, 
+                                                  from: nil, 
+                                                  for: nil)
+                    
                     viewModel.validateForm()
                     if viewModel.isFormValid {
                         viewModel.completeBooking()

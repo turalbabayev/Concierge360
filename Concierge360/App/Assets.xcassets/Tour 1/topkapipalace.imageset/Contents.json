@@ -1,0 +1,23 @@
+{
+  "images" : [
+    {
+      "filename" : "195d841ddf7a05564be5706fed1a2332-13472-Istanbul-SkiptheLineGuidedTourofTopkapiPalace-01@1x.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "195d841ddf7a05564be5706fed1a2332-13472-Istanbul-SkiptheLineGuidedTourofTopkapiPalace-01@2x.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "195d841ddf7a05564be5706fed1a2332-13472-Istanbul-SkiptheLineGuidedTourofTopkapiPalace-01@3x.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
