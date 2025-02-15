@@ -203,14 +203,14 @@ private struct SectionHeader: View {
     private var destinationView: some View {
         switch destination {
         case .tours:
-            Text("All Tours View") // Buraya ToursView() gelecek
+            ToursView() // ToursView'a yönlendirme
         case .services:
-            Text("All Services View") // Buraya ServicesView() gelecek
+            Text("All Services View") // Şimdilik bekletiyoruz
         }
     }
 }
 
-// Enum'u ekleyelim
+// Enum'u güncelleyelim
 enum SeeAllDestination {
     case tours
     case services
@@ -220,69 +220,71 @@ struct ServiceRow: View {
     var service: Services
     
     var body: some View {
-        HStack(spacing: 12) {
-            // Sol taraftaki resim
-            Image(service.imageName)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 70, height: 70)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
+        NavigationLink(destination: ServiceBookingView(service: service)) {
+            HStack(spacing: 12) {
+                // Sol taraftaki resim
+                Image(service.imageName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 70, height: 70)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
 
-            // Orta kısım - Bilgiler
-            VStack(alignment: .leading, spacing: 6) {
-                Text(service.name)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(.black)
-                
-                // Rating ve fiyat bilgisi
-                HStack(spacing: 12) {
-                    // Rating
-                    HStack(spacing: 4) {
-                        Image(systemName: "star.fill")
-                            .foregroundColor(.yellow)
-                            .font(.system(size: 12))
-                        Text(String(format: "%.1f", service.rating))
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundColor(.black.opacity(0.7))
-                    }
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(Color.yellow.opacity(0.15))
-                    .clipShape(Capsule())
+                // Orta kısım - Bilgiler
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(service.name)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(.black)
                     
-                    // Fiyat
-                    HStack(spacing: 2) {
-                        Text("$\(service.price)")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.mainColor)
-                        Text("/one way")
-                            .font(.system(size: 11))
-                            .foregroundColor(.gray)
+                    // Rating ve fiyat bilgisi
+                    HStack(spacing: 12) {
+                        // Rating
+                        HStack(spacing: 4) {
+                            Image(systemName: "star.fill")
+                                .foregroundColor(.yellow)
+                                .font(.system(size: 12))
+                            Text(String(format: "%.1f", service.rating))
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.black.opacity(0.7))
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.yellow.opacity(0.15))
+                        .clipShape(Capsule())
+                        
+                        // Fiyat
+                        HStack(spacing: 2) {
+                            Text("$\(service.price)")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(.mainColor)
+                            Text("/one way")
+                                .font(.system(size: 11))
+                                .foregroundColor(.gray)
+                        }
+                    }
+                    
+                    // Özellikler
+                    HStack(spacing: 8) {
+                        FeatureTag(text: "24/7")
+                        FeatureTag(text: "Free Wifi")
                     }
                 }
                 
-                // Özellikler
-                HStack(spacing: 8) {
-                    FeatureTag(text: "24/7")
-                    FeatureTag(text: "Free Wifi")
-                }
+                Spacer()
+                
+                // Sağ taraf - Ok işareti
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.gray)
             }
-            
-            Spacer()
-            
-            // Sağ taraf - Ok işareti
-            Image(systemName: "chevron.right")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(.gray)
+            .padding(10)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.white)
+                    .shadow(color: .black.opacity(0.03), radius: 8, x: 0, y: 4)
+            )
+            .transition(.scale.combined(with: .opacity))
         }
-        .padding(10)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white)
-                .shadow(color: .black.opacity(0.03), radius: 8, x: 0, y: 4)
-        )
-        .transition(.scale.combined(with: .opacity))
     }
 }
 

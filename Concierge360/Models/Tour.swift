@@ -7,6 +7,13 @@
 
 import SwiftUI
 
+enum TourCategory: String {
+    case popular = "Popular"
+    case new = "New"
+    case historical = "Historical"
+    case cultural = "Cultural"
+}
+
 struct Tour: Identifiable {
     let id = UUID()
     let title: String
@@ -22,6 +29,7 @@ struct Tour: Identifiable {
     let includedServices: [String]?
     let excludedServices: [String]?
     let visitingPlaces: [Place]?
+    let category: TourCategory
 }
 
 struct Place: Identifiable {
@@ -161,7 +169,8 @@ var tourList: [Tour] = [
                   latitude: 41.0392,
                   longitude: 29.0007,
                   description: "Underwater world of marine life")
-        ]
+        ],
+        category: .popular
     ),
     .init(
         title: "Turkish Hamam Tour",
@@ -210,7 +219,8 @@ var tourList: [Tour] = [
                   latitude: 41.0082,
                   longitude: 28.9784,
                   description: "Traditional Turkish bath")
-        ]
+        ],
+        category: .popular
     ),
     .init(
         title: "The Horizon Retreat",
@@ -290,7 +300,8 @@ var tourList: [Tour] = [
             "Additional activities",
             "Gratuities"
         ],
-        visitingPlaces: nil
+        visitingPlaces: nil,
+        category: .popular
     ),
     .init(
         title: "Panorama of the Bosporus",
@@ -338,7 +349,8 @@ var tourList: [Tour] = [
                   latitude: 41.0211,
                   longitude: 29.0041,
                   description: "Historic tower on a small islet")
-        ]
+        ],
+        category: .popular
     ),
     .init(
         title: "Panoramıc Istanbul",
@@ -386,7 +398,8 @@ var tourList: [Tour] = [
                   latitude: 41.0547,
                   longitude: 28.9435,
                   description: "Historic hilltop cafe")
-        ]
+        ],
+        category: .popular
     ),
     
 ]
@@ -433,8 +446,11 @@ extension Tour {
                   latitude: 41.0211, 
                   longitude: 29.0041,
                   description: "Historic tower on a small islet")
-        ]
+        ],
+        category: .popular
     )
+
+
 }
 
 #Preview {
@@ -479,6 +495,7 @@ extension Tour {
                   latitude: 41.0211, 
                   longitude: 29.0041,
                   description: "Historic tower on a small islet")
-        ]
+        ],
+        category: .popular
     ))
 }

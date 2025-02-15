@@ -44,6 +44,7 @@ struct GradientButtonStyle: ButtonStyle {
 
 struct NavigationBarButton {
     let title: String
+    let icon: String?
     let action: () -> Void
 }
 
@@ -95,14 +96,20 @@ struct CustomNavigationBar: View {
                 // Trailing - Sağ kısım (Opsiyonel buton)
                 if let button = rightButton {
                     Button(action: button.action) {
-                        Text(button.title)
-                            .font(.system(size: 14))
-                            .foregroundColor(color)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .background(Color.gray.opacity(0.2))
-                            .cornerRadius(10)
-                            .lineLimit(1)
+                        if let icon = button.icon {
+                            Image(systemName: icon)
+                                .font(.system(size: 20))
+                                .foregroundColor(color)
+                        } else {
+                            Text(button.title)
+                                .font(.system(size: 14))
+                                .foregroundColor(color)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(Color.gray.opacity(0.2))
+                                .cornerRadius(10)
+                                .lineLimit(1)
+                        }
                     }
                     .frame(minWidth: 44)
                 } else {

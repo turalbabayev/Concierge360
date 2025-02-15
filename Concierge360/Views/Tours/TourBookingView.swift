@@ -453,7 +453,8 @@ private struct FormSection<Content: View>: View {
     }
 }
 
-private struct CustomTextField: View {
+
+struct CustomTextField: View {
     let title: String
     @Binding var text: String
     let placeholder: String
@@ -474,7 +475,8 @@ private struct CustomTextField: View {
     }
 }
 
-private struct ValidatedTextField: View {
+
+struct ValidatedTextField: View {
     let title: String
     @Binding var text: String
     let placeholder: String
@@ -487,6 +489,37 @@ private struct ValidatedTextField: View {
         case phone
         case email
         case roomNumber
+        case passport
+        
+        var keyboardType: UIKeyboardType {
+            switch self {
+            case .phone:
+                return .phonePad
+            case .email:
+                return .emailAddress
+            case .roomNumber:
+                return .numberPad
+            case .passport:
+                return .asciiCapable
+            case .name:
+                return .default
+            }
+        }
+        
+        var textContentType: UITextContentType? {
+            switch self {
+            case .name:
+                return .name
+            case .phone:
+                return .telephoneNumber
+            case .email:
+                return .emailAddress
+            case .roomNumber:
+                return nil
+            case .passport:
+                return nil
+            }
+        }
     }
     
     var body: some View {
@@ -505,8 +538,8 @@ private struct ValidatedTextField: View {
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(isValid ? Color.clear : Color.red, lineWidth: 1)
                 )
-                .keyboardType(keyboardType)
-                .textContentType(textContentType)
+                .keyboardType(type.keyboardType)
+                .textContentType(type.textContentType)
                 .onChange(of: text) { newValue in
                     text = formatText(newValue)
                 }
@@ -520,32 +553,6 @@ private struct ValidatedTextField: View {
         }
     }
     
-    private var keyboardType: UIKeyboardType {
-        switch type {
-        case .phone:
-            return .phonePad
-        case .email:
-            return .emailAddress
-        case .roomNumber:
-            return .numberPad
-        case .name:
-            return .default
-        }
-    }
-    
-    private var textContentType: UITextContentType? {
-        switch type {
-        case .name:
-            return .name
-        case .phone:
-            return .telephoneNumber
-        case .email:
-            return .emailAddress
-        case .roomNumber:
-            return nil
-        }
-    }
-    
     private func formatText(_ input: String) -> String {
         switch type {
         case .phone:
@@ -555,6 +562,8 @@ private struct ValidatedTextField: View {
         case .roomNumber:
             return input.filter { $0.isNumber }
         case .email:
+            return input.filter { !$0.isWhitespace }
+        case .passport:
             return input.filter { !$0.isWhitespace }
         }
     }

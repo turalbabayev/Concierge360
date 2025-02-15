@@ -26,8 +26,8 @@ struct LoginView: View {
             CustomNavigationBar(
                 centerText: "Don't have an account?",
                 rightButton: NavigationBarButton(
-                    title: "Get Started",
-                    action: { 
+                    title: "Get Started", icon: "",
+                    action: {
                         withAnimation {
                             showGetStartedAlert.toggle()
                         }

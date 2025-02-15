@@ -544,6 +544,6 @@ private struct BookNowButton: View {
             "Additional activities",
             "Gratuities"
         ],
-        visitingPlaces: nil
+        visitingPlaces: nil, category: .popular
     ))
 }
