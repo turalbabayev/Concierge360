@@ -171,25 +171,32 @@ struct ServiceBookingView: View {
                 .padding(.vertical, 16)
             }
             
-            if !viewModel.isCityTaxi {
-                bookingButton
-                    .transition(.move(edge: .bottom))
-            }
+            // Bottom bar sadece city taxi için
+            bookingButton
+                .transition(.move(edge: .bottom))
         }
         .navigationBarHidden(true)
         .ignoresSafeArea(.container, edges: .top)
         .background(Color(uiColor: .systemBackground))
-        // Klavyeyi kapatmak için gesture ekleyelim
         .onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
                                          to: nil, from: nil, for: nil)
         }
         .onAppear {
-            // HotelManager'ı viewModel'e aktaralım
             viewModel.setHotelManager(hotelManager)
         }
         .sheet(isPresented: $viewModel.showLocationPicker) {
-            LocationPickerView(selectedLocation: $viewModel.destinationLocation)
+            LocationPickerView2(selectedLocation: $viewModel.destinationLocation)
+        }
+        .overlay {
+            if viewModel.showBookingConfirmation {
+                ServiceBookingAlertView(
+                    bookingDetails: viewModel.bookingDetails,
+                    isPresented: $viewModel.showBookingConfirmation
+                ) {
+                    dismiss()
+                }
+            }
         }
     }
     
@@ -203,10 +210,10 @@ struct ServiceBookingView: View {
                         .font(.system(size: 12))
                         .foregroundColor(.gray)
                     Text(viewModel.priceDisplay)
-                        .font(.system(size: viewModel.isAirportTaxi ? 18 : 24, weight: .bold))
-                        .foregroundColor(viewModel.isAirportTaxi ? .orange : .mainColor)
+                        .font(.system(size: viewModel.isAirportTaxi ? 24 : 18, weight: .bold))
+                        .foregroundColor(viewModel.isAirportTaxi && viewModel.isCityTaxi ? .orange : .mainColor)
                     
-                    if viewModel.isAirportTaxi {
+                    if viewModel.isAirportTaxi && viewModel.isCityTaxi {
                         Text("Price will be calculated by taximeter")
                             .font(.system(size: 11))
                             .foregroundColor(.gray)
@@ -216,9 +223,13 @@ struct ServiceBookingView: View {
                 Spacer()
                 
                 // Sağ taraf - Buton
-                Button(action: {
-                    // Rezervasyon işlemi
-                }) {
+                Button {
+                    // Önce klavyeyi kapat
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
+                                                 to: nil, from: nil, for: nil)
+                    // Sonra booking işlemini başlat
+                    viewModel.completeBooking()
+                } label: {
                     Text("Complete Booking")
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.white)
@@ -257,6 +268,16 @@ struct ServiceBookingView: View {
                           in: viewModel.minimumTime...,
                           displayedComponents: .hourAndMinute)
                     .datePickerStyle(.wheel)
+                
+                // Sadece airport taxi ve transfer için uyarı göster
+                if viewModel.isAirportTaxi || !viewModel.isCityTaxi {
+                    Text(viewModel.recommendedTimeNote)
+                        .font(.system(size: 14))
+                        .foregroundColor(.orange)
+                        .padding(.horizontal)
+                        .padding(.top, 8)
+                        .multilineTextAlignment(.leading)
+                }
             }
         }
     }
@@ -492,6 +513,127 @@ private struct LocationPickerView2: View {
                         }
                     }
                 }
+        }
+    }
+}
+
+// Alert View'u ekleyelim
+struct ServiceBookingAlertView: View {
+    let bookingDetails: ServiceBookingDetails
+    @Binding var isPresented: Bool
+    let onDismiss: () -> Void
+    
+    var body: some View {
+        ZStack {
+            // Arkaplan overlay
+            Color.black.opacity(0.3)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    withAnimation(.spring()) {
+                        isPresented = false
+                    }
+                }
+            
+            // Alert içeriği
+            VStack(spacing: 0) {
+                // Header
+                VStack(spacing: 16) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 50))
+                        .foregroundColor(.green)
+                        .symbolEffect(.bounce, options: .repeating)
+                    
+                    Text("Booking Confirmed!")
+                        .font(.system(size: 24, weight: .bold))
+                    
+                    Text("Your service has been successfully reserved")
+                        .font(.system(size: 16))
+                        .foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.vertical, 24)
+                
+                Divider()
+                
+                // Booking Details
+                VStack(alignment: .leading, spacing: 20) {
+                    detailRow(icon: "car.fill", title: "Service", value: bookingDetails.serviceName)
+                    detailRow(icon: "calendar", title: "Date", value: bookingDetails.date)
+                    detailRow(icon: "clock.fill", title: "Time", value: bookingDetails.time)
+                    
+                    if !bookingDetails.displayLocation.isEmpty {
+                        detailRow(icon: "location.fill", title: "Location", value: bookingDetails.displayLocation)
+                    }
+                    
+                    detailRow(icon: "dollarsign.circle.fill", title: "Total Price", value: bookingDetails.totalPrice)
+                }
+                .padding(24)
+                
+                Divider()
+                
+                // Sadece transfer servisi için ödeme notu göster
+                if !bookingDetails.isMeteredService {
+                    VStack(spacing: 12) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "creditcard.fill")
+                                .font(.system(size: 24))
+                                .foregroundColor(.orange)
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Payment Required")
+                                    .font(.system(size: 16, weight: .semibold))
+                                Text("Please visit the reception desk to complete your payment")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 16)
+                    }
+                    .background(Color.orange.opacity(0.1))
+                    
+                    Divider()
+                }
+                
+                // Done Button
+                Button {
+                    withAnimation(.spring()) {
+                        isPresented = false
+                        onDismiss()
+                    }
+                } label: {
+                    Text("Done")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(height: 50)
+                        .frame(maxWidth: .infinity)
+                        .background(Color.mainColor)
+                        .cornerRadius(25)
+                }
+                .padding(24)
+            }
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color.white)
+            )
+            .padding(20)
+        }
+    }
+    
+    private func detailRow(icon: String, title: String, value: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 20))
+                .foregroundColor(.mainColor)
+                .frame(width: 24)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.system(size: 14))
+                    .foregroundColor(.gray)
+                Text(value)
+                    .font(.system(size: 16, weight: .medium))
+            }
         }
     }
 } 

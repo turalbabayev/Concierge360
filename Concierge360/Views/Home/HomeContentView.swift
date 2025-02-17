@@ -203,9 +203,9 @@ private struct SectionHeader: View {
     private var destinationView: some View {
         switch destination {
         case .tours:
-            ToursView() // ToursView'a yönlendirme
+            ToursView()
         case .services:
-            Text("All Services View") // Şimdilik bekletiyoruz
+            AllServicesView()
         }
     }
 }
@@ -216,6 +216,7 @@ enum SeeAllDestination {
     case services
 }
 
+// ServiceRow'u eski haline getirelim
 struct ServiceRow: View {
     var service: Services
     

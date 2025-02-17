@@ -28,10 +28,11 @@ struct Services: Identifiable {
 
 enum ServiceCategory: String, CaseIterable, Identifiable {
     case all = "All"
-    case transfer = "Transfer Service"
-    case taxi = "Taxi Service"
-
-    var id: String { self.rawValue }
+    case taxi = "Taxi Services"
+    case transfer = "Transfer Services"
+    
+    var title: String { rawValue }
+    var id: String { rawValue }
 }
 
 // HomeContentViewModel'deki örnek verileri güncelleyelim
@@ -58,7 +59,7 @@ extension Services {
             imageName: "taxi",
             vehicleType: .airport,
             maxPassengers: 4,
-            features: ["Fixed Price", "Flight Tracking", "24/7 Service"]
+            features: ["Metered Price", "Flight Tracking", "24/7 Service"]
         ),
         
         // City Taxi

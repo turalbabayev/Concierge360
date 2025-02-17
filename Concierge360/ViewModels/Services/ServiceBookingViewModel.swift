@@ -1,6 +1,26 @@
 import Foundation
 import SwiftUI
 
+struct ServiceBookingDetails {
+    let serviceName: String
+    let date: String
+    let time: String
+    let numberOfPeople: Int
+    let totalPrice: String
+    let destination: String?
+    let airport: String?
+    let isMeteredService: Bool
+    
+    var displayLocation: String {
+        if let destination = destination {
+            return destination
+        } else if let airport = airport {
+            return airport
+        }
+        return ""
+    }
+}
+
 class ServiceBookingViewModel: ObservableObject {
     private var hotelManager: HotelManager?
     let service: Services
@@ -135,6 +155,67 @@ class ServiceBookingViewModel: ObservableObject {
         } else {
             return "Up to 4 passengers"
         }
+    }
+    
+    // Complete Booking fonksiyonunu ekleyelim
+    func completeBooking() {
+        // Form validasyonu
+        guard isValidForm else {
+            showError = true
+            errorMessage = "Please fill all required fields"
+            return
+        }
+        
+        // Booking detaylarını yazdır
+        print("\n=== SERVICE BOOKING DETAILS ===")
+        print("Service: \(service.name)")
+        print("Type: \(service.vehicleType.rawValue)")
+        print("\n--- Customer Information ---")
+        print("Full Name: \(fullName)")
+        print("Room Number: \(roomNumber)")
+        print("Phone: \(phoneNumber)")
+        if !email.isEmpty { print("Email: \(email)") }
+        
+        if !isCityTaxi && !isAirportTaxi {
+            print("\n--- Passengers ---")
+            print("Number of People: \(numberOfPeople)")
+            for (index, name) in guestNames.enumerated() where index < numberOfPeople {
+                print("Guest \(index + 1): \(name)")
+            }
+        }
+        
+        print("\n--- Booking Details ---")
+        print("Date: \(selectedDate.formatted(date: .long, time: .omitted))")
+        print("Time: \(selectedTime.formatted(date: .omitted, time: .shortened))")
+        
+        if isCityTaxi {
+            print("Destination: \(destinationLocation)")
+        } else if isAirportTaxi {
+            print("Airport: \(selectedAirport.rawValue)")
+        }
+        
+        if !customerMessage.isEmpty {
+            print("\nCustomer Message: \(customerMessage)")
+        }
+        
+        print("\nPrice: \(priceDisplay)")
+        print("============================\n")
+        
+        // Booking confirmation göster
+        showBookingConfirmation = true
+    }
+    
+    var bookingDetails: ServiceBookingDetails {
+        ServiceBookingDetails(
+            serviceName: service.name,
+            date: selectedDate.formatted(date: .long, time: .omitted),
+            time: selectedTime.formatted(date: .omitted, time: .shortened),
+            numberOfPeople: numberOfPeople,
+            totalPrice: priceDisplay,
+            destination: isCityTaxi ? destinationLocation : nil,
+            airport: isAirportTaxi ? selectedAirport.rawValue : nil,
+            isMeteredService: isCityTaxi || isAirportTaxi // Taksi servisleri için true
+        )
     }
     
     // Daha sonra eklenecek özellikler ve fonksiyonlar
