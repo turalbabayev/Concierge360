@@ -3,7 +3,6 @@ import SwiftUI
 struct AllServicesView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = AllServicesViewModel()
-    @State private var showSearchBar = false
     @State private var selectedCategory: ServiceCategory = .all
     
     var body: some View {
@@ -11,21 +10,8 @@ struct AllServicesView: View {
             // MARK: - Navigation Bar
             CustomNavigationBar(
                 title: "All Services",
-                rightButton: NavigationBarButton(
-                    title: "",
-                    icon: showSearchBar ? "xmark" : "magnifyingglass",
-                    action: { withAnimation(.spring()) { showSearchBar.toggle() } }
-                ),
                 color: .black
             )
-            
-            // MARK: - Search Bar
-            if showSearchBar {
-                SearchBar(text: $viewModel.searchText)
-                    .padding(.horizontal)
-                    .padding(.top, 8)
-                    .transition(.move(edge: .top).combined(with: .opacity))
-            }
             
             // MARK: - Content
             ScrollView(showsIndicators: false) {
@@ -68,35 +54,6 @@ struct AllServicesView: View {
 }
 
 // MARK: - Supporting Views
-private struct SearchBar: View {
-    @Binding var text: String
-    
-    var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(.gray)
-            
-            TextField("Search services...", text: $text)
-                .font(.system(size: 16))
-                .autocapitalization(.none)
-            
-            if !text.isEmpty {
-                Button {
-                    text = ""
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.gray)
-                }
-            }
-        }
-        .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.gray.opacity(0.1))
-        )
-    }
-}
-
 private struct CategoryButton: View {
     let title: String
     let isSelected: Bool
