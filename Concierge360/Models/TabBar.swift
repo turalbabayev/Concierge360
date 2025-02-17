@@ -25,7 +25,7 @@ enum TabIcon: String {
 let tabItems = [
     TabBar(iconname: "house.fill", tab: .Home, index: 0),
     TabBar(iconname: "bell.fill", tab: .bell, index: 1),
-    TabBar(iconname: "message.fill", tab: .message, index: 2),
+    TabBar(iconname: "message.badge.fill", tab: .message, index: 2),
     TabBar(iconname: "star.fill", tab: .like, index: 3),
     TabBar(iconname: "person.fill", tab: .person, index: 4)
 ]

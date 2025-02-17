@@ -15,6 +15,7 @@ struct Concierge360App: App {
     var body: some Scene {
         WindowGroup {
             OnboardingView()
+                .preferredColorScheme(.light) // Light mode'u zorla
                 .environmentObject(hotelManager)
                 .environmentObject(authManager)
                 .onAppear {

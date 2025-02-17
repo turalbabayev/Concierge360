@@ -43,12 +43,7 @@ struct HotelSelectionView: View {
                     .shadow(radius: 10)
                 
                 VStack {
-                    SearchField(show: $showSearch, text: $hotelManager.searchText)
-                        .padding(.top, 20)
-                        .onChange(of: hotelManager.searchText) {
-                            hotelManager.filterHotels(with: hotelManager.searchText)
-                        }
-                        .focused($isSearchFieldFocused)
+                    searchSection
                     
                     if hotelManager.filteredHotels.isEmpty {
                         Spacer()
@@ -99,6 +94,18 @@ struct HotelSelectionView: View {
         .edgesIgnoringSafeArea(.all)
         .onTapGesture {
             isSearchFieldFocused = false
+        }
+    }
+
+    var searchSection: some View {
+        CommonSearchBar(
+            text: $hotelManager.searchText,
+            placeholder: "Search Hotel..."
+        )
+        .padding(.horizontal)
+        .padding(.top, 20)
+        .onChange(of: hotelManager.searchText) { _ in
+            hotelManager.filterHotels(with: hotelManager.searchText)
         }
     }
 }

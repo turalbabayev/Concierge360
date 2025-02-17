@@ -32,9 +32,13 @@ struct LocationPickerView: View {
     
     // Search overlay'i ayrı bir view olarak tanımlayalım
     private var searchOverlay: some View {
-        VStack {
-            SearchBar(text: $viewModel.searchText)
-                .padding()
+        VStack(spacing: 0) {
+            CommonSearchBar(
+                text: $viewModel.searchText,
+                placeholder: "Search location"
+            )
+            .padding(.horizontal)
+            .padding(.vertical, 12)
             
             if !viewModel.searchResults.isEmpty {
                 searchResultsList
@@ -63,30 +67,7 @@ struct LocationPickerView: View {
     }
 }
 
-// MARK: - Supporting Views
-private struct SearchBar: View {
-    @Binding var text: String
-    
-    var body: some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(.gray)
-            
-            TextField("Search location", text: $text)
-                .autocapitalization(.none)
-            
-            if !text.isEmpty {
-                Button(action: { text = "" }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.gray)
-                }
-            }
-        }
-        .padding(8)
-        .background(Color.white)
-        .cornerRadius(10)
-    }
-}
+
 
 private struct LocationRow: View {
     let place: MapPlace

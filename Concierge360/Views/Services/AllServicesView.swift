@@ -78,6 +78,15 @@ private struct CategoryButton: View {
 private struct ModernServiceCard: View {
     let service: Services
     
+    var priceDisplay: (text: String, color: Color) {
+        switch service.vehicleType {
+        case .vip:
+            return ("$\(service.price) / one way", .mainColor)
+        case .standard, .airport:
+            return ("Metered Price", .orange)
+        }
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Image
@@ -138,11 +147,10 @@ private struct ModernServiceCard: View {
                 
                 // Price and Passengers
                 HStack {
-                    if service.vehicleType == .standard || service.vehicleType == .airport {
-                        PriceTag(text: "Metered Price", color: .orange)
-                    } else {
-                        PriceTag(text: "$\(service.price)", color: .mainColor)
-                    }
+                    PriceTag(
+                        text: priceDisplay.text,
+                        color: priceDisplay.color
+                    )
                     
                     Spacer()
                     

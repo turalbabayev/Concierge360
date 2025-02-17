@@ -220,6 +220,15 @@ enum SeeAllDestination {
 struct ServiceRow: View {
     var service: Services
     
+    var priceDisplay: (text: String, color: Color) {
+        switch service.vehicleType {
+        case .vip:
+            return ("$\(service.price) / one way", .mainColor)
+        case .standard, .airport:
+            return ("Metered Price", .orange)
+        }
+    }
+    
     var body: some View {
         NavigationLink(destination: ServiceBookingView(service: service)) {
             HStack(spacing: 12) {
@@ -253,15 +262,18 @@ struct ServiceRow: View {
                         .background(Color.yellow.opacity(0.15))
                         .clipShape(Capsule())
                         
-                        // Fiyat
-                        HStack(spacing: 2) {
-                            Text("$\(service.price)")
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(.mainColor)
-                            Text("/one way")
-                                .font(.system(size: 11))
-                                .foregroundColor(.gray)
+                        // Modern fiyat gösterimi
+                        HStack(spacing: 4) {
+                            Image(systemName: "dollarsign.circle.fill")
+                                .font(.system(size: 12))
+                            Text(priceDisplay.text)
+                                .font(.system(size: 13, weight: .semibold))
                         }
+                        .foregroundColor(priceDisplay.color)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(priceDisplay.color.opacity(0.15))
+                        .clipShape(Capsule())
                     }
                     
                     // Özellikler

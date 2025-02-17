@@ -21,7 +21,7 @@ struct HomeView : View {
             case .bell:
                 Text("Sonra Guncellenecek")
             case .message:
-                Text("message")
+                ChatView()
             case .like:
                 Text("private")
             case .person:

@@ -53,11 +53,12 @@ struct ToursView: View {
     private var searchAndFilterSection: some View {
         VStack(spacing: 16) {
             if showSearchBar {
-                SearchBar(text: $viewModel.searchText)
-                    .transition(.asymmetric(
-                        insertion: .scale(scale: 0.8).combined(with: .opacity),
-                        removal: .scale(scale: 0.8).combined(with: .opacity)
-                    ))
+                CommonSearchBar(
+                    text: $viewModel.searchText,
+                    placeholder: "Search amazing tours..."
+                )
+                .padding(.horizontal)
+                .transition(.move(edge: .top).combined(with: .opacity))
             }
             
             ScrollView(.horizontal, showsIndicators: false) {
@@ -125,7 +126,7 @@ struct ToursView: View {
 }
 
 // MARK: - Supporting Views
-private struct SearchBar: View {
+private struct CustomSearchBar: View {
     @Binding var text: String
     @FocusState private var isFocused: Bool
     
